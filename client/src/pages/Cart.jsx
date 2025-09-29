@@ -11,6 +11,7 @@ const Cart = () => {
     getTotalCartAmount,
     getCartItemCount,
     navigate,
+    updateCartItems
   } = useAppContext();
 
   const [cartArray, setCartArray] = useState([]);
@@ -23,10 +24,10 @@ const Cart = () => {
   const getCart = () => {
     let tempArray = [];
     for (const key in cartItems) {
-      const product = product.find((item) => item._id === key);
-      if (product) {
-        product.quantity = cartItems[key];
-        tempArray.push(product);
+      const products = product.find((item) => item._id === key);
+      if (products) {
+        products.quantity = cartItems[key];
+        tempArray.push(products);
       }
     }
     setCartArray(tempArray);
@@ -53,7 +54,7 @@ const Cart = () => {
       <div className="flex-1 max-w-4xl">
         <h1 className="text-3xl font-medium mb-6">
           Shopping Cart{" "}
-          <span className="text-sm text-indigo-500">
+          <span className="text-sm text-primary">
             {getCartItemCount()} Items
           </span>
         </h1>
@@ -93,11 +94,10 @@ const Cart = () => {
                   </p>
                   <div className="flex items-center">
                     <p>Qty:</p>
-                    <select
+                    <select 
                       className="outline-none ml-2"
                       value={cartItems[product._id]}
-                      onChange={(e) =>
-                        console.log("Update qty", e.target.value)
+                      onChange={ e => updateCartItems(product._id, Number(e.target.value))
                       }
                     >
                       {[...Array(
@@ -125,7 +125,7 @@ const Cart = () => {
               className="cursor-pointer mx-auto"
             >
               <img
-                src={assets.refresh_icon}
+                src={assets.remove_icon}
                 alt="remove"
                 className="inline-block w-6 h-6"
               />
@@ -138,7 +138,7 @@ const Cart = () => {
             navigate("/products");
             scrollTo(0, 0);
           }}
-          className="group cursor-pointer flex items-center mt-8 gap-2 text-indigo-500 font-medium"
+          className="group cursor-pointer flex items-center mt-8 gap-2 text-primary font-medium"
         >
           <img
             className="group-hover:-translate-x-1 transition"
@@ -165,7 +165,7 @@ const Cart = () => {
             </p>
             <button
               onClick={() => setShowAddress(!showAddress)}
-              className="text-indigo-500 hover:underline cursor-pointer"
+              className="text-primary hover:underline cursor-pointer"
             >
               Change
             </button>
@@ -187,7 +187,7 @@ const Cart = () => {
 
                 <p
                   onClick={() => navigate("/add-address")}
-                  className="text-indigo-500 text-center cursor-pointer p-2 hover:bg-indigo-500/10"
+                  className="text-primary text-center cursor-pointer p-2 hover:bg-primary/10"
                 >
                   Add address
                 </p>
@@ -239,7 +239,7 @@ const Cart = () => {
 
         <button
           onClick={placeOrder}
-          className="w-full py-3 mt-6 cursor-pointer bg-indigo-500 text-white font-medium hover:bg-indigo-600 transition"
+          className="w-full py-3 mt-6 cursor-pointer bg-primary text-white font-medium hover:bg-primary-dull transition"
         >
           {paymentOption === "COD" ? "Place Order" : "Proceed to Checkout"}
         </button>
