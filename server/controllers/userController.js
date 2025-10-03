@@ -1,9 +1,7 @@
-import User from '../models/User.js';
+import User from '../models/user.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET;
-
-
 
 //register user : /api/user/register
 export const register = async (req, res) => {
@@ -54,8 +52,52 @@ export const login = async (req, res) => {
 
         if (!isMatch) return res.status(400).json({success:false, message: 'Invalid Email or Password'});
 
-        const token = jwt.sign()
-    }catch(err) {
+        const token = jwt.sign({id: user._id}, JWT_SECRET, {expiresIn: '7d'});
+        res.cookie('token', token, {
+            httpOnly: true, //prevent js to access the cookie
+            secure: process.env.NODE_ENV === 'production', // use Secure cookie in production
+            sameSite: process.env.NODE_ENV  ? 'none' : 'strict',  //CSRF protection
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days // cookie expiration time
+        })
 
+        return res.status(200).json({success: true, user:{email: user.email, name:user.name}})
+
+
+    }catch(err) {
+        console.log(err);
+        res.status(500).json({success: false, message: err.message});
+    }
+}
+
+
+
+//check auth :/api/user/is_auth
+// --> whether user is authenticated or not 
+export const isAuth = async (req, res) => {
+    try {
+        const  {userId } = req.body;
+        const user = await User.findById(userId).select('-password')
+        return res.json({success:true, user})
+
+    }catch(error) {
+        console.log(error);
+        return res.status(401).json({message: error.message});
+    }
+}
+
+//Logout User : /api/user/logout
+export const logout = async (req, res) => {
+    try {
+        res.clearCookie('token',{
+            httpOnly:true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+        })
+
+        return res.json({success:true, message:'Logged out successfully'}); 
+        
+    }catch(error) {
+        console.log(error);
+        return res.status(500).json({message: error.message});
     }
 }
