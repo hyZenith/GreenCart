@@ -1,0 +1,20 @@
+import mongoose, { mongo } from "mongoose";
+
+const orerSchema = new mongoose.Schema({
+    userId:{ type: String, required: true, ref: "User" },
+    items:[{
+        product:{type:String, required:true, ref:"Product"},
+        quantity:{type:Number, required:true}
+
+    }],
+    amount:{type:Number , required: true},
+    address:{type:String, required:true, ref:'address'},
+    status:{type:String, default:"Order Placed"},
+    paymentType:{type:String, required:true},
+    isPayed:{type:Boolean, required:true ,default:false},
+})
+
+
+const Order = mongoose.models.Order  || mongoose.model("Order", orerSchema);
+
+export default Order;
