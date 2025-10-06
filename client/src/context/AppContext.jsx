@@ -3,6 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { dummyProducts } from "../assets/assets";
 export const AppContext = createContext();
 import toast from "react-hot-toast";
+import axios from "axios";
+
+// for sending cookies with every request
+axios.defaults.withCredentials = true;
+// setting the base url for axios
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 
 export const AppContextProvider = ({ children }) => {
 
@@ -17,6 +23,19 @@ export const AppContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState({})
   const [searchQuery, setSearchQuery] = useState({})
 
+  // fetch seller status for every page load
+  const fetchSeller = async () => {
+    try {
+      const {data} = await axios.get('/api/seller/is-auth') 
+      if (data.success) {
+        setIsSeller(true);
+      }else {
+        setIsSeller(false);
+      }
+    } catch (error) {
+      setIsSeller(false);
+    }
+  }
 
   // we need to call the fetchProducts  when the page is loaded , so we use useEffect
   //fetch all products
@@ -89,11 +108,12 @@ export const AppContextProvider = ({ children }) => {
 
 
   useEffect(() => {
+    fetchSeller();
     fetchProducts();
   }, []); // dependency array is empty because we want to call the fetchProducts when the page is loaded
 
 
-  const value = { navigate, user, setUser, isSeller, setIsSeller, showUserLogin, setShowUserLogin, product , currency, cartItems , addToCart, updateCartItems, removeCartItem, searchQuery, setSearchQuery, getTotalCartAmount , getCartItemCount};
+  const value = { navigate, user, setUser, isSeller, setIsSeller, showUserLogin, setShowUserLogin, product , currency, cartItems , addToCart, updateCartItems, removeCartItem, searchQuery, setSearchQuery, getTotalCartAmount , getCartItemCount, axios};
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
