@@ -37,10 +37,33 @@ export const AppContextProvider = ({ children }) => {
     }
   }
 
+  // fetch user auth status , user Data, and Cart items
+  const fetchUser = async() => {
+    try{
+      const {data} = await axios.get('api/user/is-auth')
+      if (data.success) {
+        setUser(data.user)
+        setCartItems(data.user.cartItems)
+      }
+    }catch(error) {
+      setUser(null)
+    }
+  }
+
   // we need to call the fetchProducts  when the page is loaded , so we use useEffect
   //fetch all products
   const fetchProducts = async () =>{
-    setProducts(dummyProducts)
+    try {
+      const {data} = await axios.get('/api/product/list') 
+      if (data.success) {
+        setProducts(data.products);
+      }else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message); 
+    }
+
   }
 
   // add product to cart
@@ -108,12 +131,14 @@ export const AppContextProvider = ({ children }) => {
 
 
   useEffect(() => {
+    fetchUser();
     fetchSeller();
     fetchProducts();
   }, []); // dependency array is empty because we want to call the fetchProducts when the page is loaded
 
 
-  const value = { navigate, user, setUser, isSeller, setIsSeller, showUserLogin, setShowUserLogin, product , currency, cartItems , addToCart, updateCartItems, removeCartItem, searchQuery, setSearchQuery, getTotalCartAmount , getCartItemCount, axios};
+  const value = { navigate, user, setUser, isSeller, setIsSeller, showUserLogin, setShowUserLogin, product , currency, cartItems , addToCart, updateCartItems, removeCartItem, searchQuery, setSearchQuery, getTotalCartAmount , getCartItemCount, axios, fetchProducts
+  };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

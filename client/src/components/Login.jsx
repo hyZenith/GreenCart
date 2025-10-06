@@ -1,23 +1,46 @@
 import React from "react";
 import { useAppContext } from "../context/AppContext";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useState } from "react";
 
 const Login = () => {
-  const { setShowUserLogin, setUser} = useAppContext();
+  const { setShowUserLogin, setUser, navigate, axios: appAxios } = useAppContext();
+  const [state, setState] = useState("login");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+
 
     // this will stop the page from reloading on form submit
   const onSubmitHandler = async (e) => {
-    e.preventDefault();
-    setUser({
-        email: 'test@gmail.com',
-        name: "GreatStack"
-    })
-    setShowUserLogin(false);
+    try {
+      e.preventDefault();
+      // Use POST for login/register, send data in body
+      const payload = state === 'register'
+        ? { name, email, password }
+        : { email, password };
+  // prefer the configured axios instance from AppContext (baseURL + withCredentials)
+  const http = appAxios || axios;
+  const { data } = await http.post(`/api/user/${state}`, payload);
+
+      if (data.success) {
+        navigate('/');
+        setUser(data.user);
+        setShowUserLogin(false);
+      } else {
+        toast.error(data.message);
+      }
+
+    } catch (error) {
+      // Prefer backend message when available
+      const message = error?.response?.data?.message || error?.message || 'Request failed';
+      toast.error(message);
+    }
   }
 
-  const [state, setState] = React.useState("login");
-  const [name, setName] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
+
 
   return (
     <div
