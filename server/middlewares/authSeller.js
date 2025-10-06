@@ -4,7 +4,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // Middleware to authenticate seller using JWT token from cookies
 const authSeller = async (req, res, next) => {
-    const {sellerToken} = req.cookies ;
+    const {sellerToken} = req.cookies;
 
     if (!sellerToken) {
         return res.status(401).json({message: 'Unauthorized'});
