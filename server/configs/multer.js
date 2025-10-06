@@ -1,3 +1,5 @@
-import multer  from "multer";
+import multer from "multer";
 
-export const upload = multer({storage: multer.diskStorage({})})
+// Use memory storage so files are available as buffers (req.files[i].buffer)
+const storage = multer.memoryStorage();
+export const upload = multer({ storage });
