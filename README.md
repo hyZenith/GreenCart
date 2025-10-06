@@ -1,16 +1,40 @@
-# GreenCart 🛒 Grocery Website
-A full-stack grocery e-commerce application built using the **MERN** stack (MongoDB, Express.js, React.js, Node.js). This website allows users to browse groceries, add items to cart, place orders, and for admins to manage products and orders.
+# 🛒 Grocery Store - MERN Stack E-commerce Application
+
+A full-featured **Grocery E-commerce Web Application** built using the **MERN Stack** (MongoDB, Express.js, React.js, Node.js). This platform allows customers to browse and shop groceries, and provides an admin panel for managing products, users, and orders.
+
 ---
 
-### 👤 User Features:
-- Browse grocery products by category
-- Search and filter products
-- Add items to cart
-- Register/Login with JWT authentication
-- Place orders and view order history
+## 🚀 Live Demo
+
+👉 [Live Website]
+
+## ✨ Features
+### ✅ Customer Features
+- User Registration and Secure Login (JWT)
+- Browse, search, and filter grocery products
+- Add to cart and place orders
+- View order history
+
+### ✅ Admin Features
+- Admin login
+- Add/edit/delete products
+- Manage all customer orders
+- View and manage users
+
+---
+
+## 🧰 Tech Stack
+
+**Frontend:**
+- React.js
+- Axios
+- TailwindCSS 
+
+**Backend:**
+- Node.js
+- Express.js
+- MongoDB (with Mongoose ODM)
+- Cloudinary (for image )
 
 
-### 🛠️ Admin Features:
-- Add, update, and delete products
-- Manage orders
-- View user list
+
