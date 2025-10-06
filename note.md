@@ -60,3 +60,40 @@ const isSeller = useLocation().pathname.includes('seller');
 change product to products in the context.jsx file
 add adress
 6: 29
+
+
+There is a error in the backend server
+`import { authUser } from '../middlewares/authUser.js';`
+
+```js
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded.id) {
+            req.body.userId = decoded.id;
+        }
+        else {
+            return res.status(401).json({message: 'Unauthorized'});
+        }
+        next();
+
+    }catch (error) {
+        console.log(error);
+        return res.status(401).json({message: error.message});
+    }
+}
+```
+req.body.userId = decoded.id;  --> userId is not defined in the req.body
+
+```js
+    req.userId = decoded.id;
+    if (!req.body) req.body = {};
+    req.body.userId = decoded.id;
+```
+if the req.body is not defined then define it as an empty object
+
+
+
+- using cloudinary for image upload
+- multer is a
+
+9:06
