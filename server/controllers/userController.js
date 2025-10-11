@@ -26,7 +26,7 @@ export const register = async (req, res) => {
         res.cookie('token',token, {
             httpOnly: true, //prevent js to access the cookie
             secure: process.env.NODE_ENV === 'production', // use Secure cookie in production
-            sameSite: process.env.NODE_ENV  ? 'none' : 'strict',  //CSRF protection 
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',  //CSRF protection 
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days // cookie expiration time
         })
         return res.status(201).json({success: true, user:{email: user.email, name:user.name}})
@@ -56,7 +56,7 @@ export const login = async (req, res) => {
         res.cookie('token', token, {
             httpOnly: true, //prevent js to access the cookie
             secure: process.env.NODE_ENV === 'production', // use Secure cookie in production
-            sameSite: process.env.NODE_ENV  ? 'none' : 'strict',  //CSRF protection
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',  //CSRF protection
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days // cookie expiration time
         })
 
