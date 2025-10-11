@@ -2,6 +2,8 @@
 # GreenCart — Grocery E-commerce (MERN)
 
 A full-stack grocery e-commerce application built with MongoDB, Express, React (Vite), and Node.js. It includes a customer-facing React app and an Express API server with image uploads (Cloudinary), authentication (JWT cookies), and basic order/cart/address flows.
+<img width="1863" height="929" alt="plGmWxbK5v" src="https://github.com/user-attachments/assets/49f94f37-d5bc-43b8-a0ab-45974e4ab3d1" />
+
 
 This README covers local setup, environment variables, common troubleshooting, and quick developer notes.
 
