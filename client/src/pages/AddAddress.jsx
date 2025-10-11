@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { assets } from "../assets/assets";
+import toast from "react-hot-toast";
+import { useAppContext } from "../context/AppContext";
 
 // imput field Component
 const InputField = ({ type, placeholder, name, handleChange, address }) => (
@@ -15,14 +17,18 @@ const InputField = ({ type, placeholder, name, handleChange, address }) => (
 );
 
 const AddAddress = () => {
+  const { navigate, axios: http, user } = useAppContext();
+
   const [address, setAddress] = useState({
-    firstname: "",
-    lastname: "",
+    firstName: "",
+    lastName: "",
+    email: "",
     street: "",
     city: "",
     state: "",
     zipcode: "",
     country: "",
+    phone: "",
   });
 
   const handleChange = (e) => {
@@ -32,9 +38,49 @@ const AddAddress = () => {
       [name]: value,
     }));
   };
-  const onSubmitHandler = (e) => {
+
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
+    try {
+      const userId = user?._id || user?.userId || user?.id;
+      if (!userId) {
+        toast.error('You must be logged in to add address');
+        return navigate('/');
+      }
+      let res;
+      if (http) {
+        // use axios instance provided by context
+        const response = await http.post('/api/address/add', { address, userId });
+        res = response.data;
+      } else {
+        // fallback to fetch if axios isn't available
+        const response = await fetch('/api/address/add', {
+          method: 'POST',
+          // when using fetch fallback in case http isn't available (shouldn't happen)
+          body: JSON.stringify({ address, userId }),
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+        res = await response.json();
+      }
+
+      if (res && res.success) {
+        toast.success('Address added successfully');
+        navigate('/cart');
+      } else {
+        toast.error((res && res.message) || 'Failed to add address');
+      }
+    } catch (error) {
+      const message = error?.response?.data?.message || error?.message || 'Server Error';
+      toast.error(message);
+    }
   };
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/cart');
+    }
+  }, [user, navigate]);
 
   return (
     <div className="mt-16 pb-16">
@@ -56,7 +102,7 @@ const AddAddress = () => {
               <InputField
                 handleChange={handleChange}
                 address={address}
-                name="lastname"
+                name="lastName"
                 placeholder="Last Name"
                 type="text"
               />
@@ -111,8 +157,8 @@ const AddAddress = () => {
                 name="country"
               />
             </div>
-            <InputField handleChange={handleChange} address={address} type="number" name="Phone" placeholder="Phone" />
-            <button className="w-full mt-6 bg-primary text-whitep py-3 hover:bg-primary-dull transition cursor-pointer uppercase rounded-md"> Save address </button>
+            <InputField handleChange={handleChange} address={address} type="number" name="phone" placeholder="Phone" />
+            <button className="w-full mt-6 bg-primary text-white py-3 hover:bg-primary-dull transition cursor-pointer uppercase rounded-md"> Save address </button>
           </form>
         </div>
         <img src={assets.add_address_iamge} alt="Add Address" />

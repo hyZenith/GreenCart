@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { dummyProducts } from "../assets/assets";
 export const AppContext = createContext();
 import toast from "react-hot-toast";
@@ -7,8 +7,8 @@ import axios from "axios";
 
 // for sending cookies with every request
 axios.defaults.withCredentials = true;
-// setting the base url for axios
-axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
+// During development we proxy /api to backend via Vite; keep baseURL empty so requests are same-origin
+axios.defaults.baseURL = '';
 
 export const AppContextProvider = ({ children }) => {
 
@@ -40,7 +40,7 @@ export const AppContextProvider = ({ children }) => {
   // fetch user auth status , user Data, and Cart items
   const fetchUser = async() => {
     try{
-      const {data} = await axios.get('api/user/is-auth')
+      const {data} = await axios.get('/api/user/is-auth')
       if (data.success) {
         setUser(data.user)
         setCartItems(data.user.cartItems)
@@ -130,15 +130,41 @@ export const AppContextProvider = ({ children }) => {
 
 
 
+  const location = useLocation();
+
   useEffect(() => {
     fetchUser();
-    fetchSeller();
+    // only check seller auth when the current location is a seller route
+    if (location.pathname.includes('seller')) {
+      fetchSeller();
+    }
     fetchProducts();
-  }, []); // dependency array is empty because we want to call the fetchProducts when the page is loaded
+  }, [location.pathname]); // re-run when location changes
 
+  //update db cart when cartItems change
+  useEffect(()=> {
+      const updateCart = async () => {
+        try {
+          // include userId explicitly to be robust
+          const userId = user?._id || user?.userId || null;
+          const {data} = await axios.post('/api/cart/update', { userId, cartItems })
 
-  const value = { navigate, user, setUser, isSeller, setIsSeller, showUserLogin, setShowUserLogin, product , currency, cartItems , addToCart, updateCartItems, removeCartItem, searchQuery, setSearchQuery, getTotalCartAmount , getCartItemCount, axios, fetchProducts
-  };
+          if (!data.success) {
+            toast.error(data.message)
+          }
+        } catch (error) {
+          toast.error(error.message);
+        }
+      }
+
+      if (user) {
+        updateCart();
+      }
+  },[cartItems])
+
+  const value = { navigate, user, setUser, isSeller, setIsSeller, showUserLogin, setShowUserLogin, product , currency, cartItems , addToCart, updateCartItems, removeCartItem, searchQuery, setSearchQuery, getTotalCartAmount , getCartItemCount, axios, fetchProducts, setCartItems};
+  // expose setCartItems so pages can clear the cart when needed
+  value.setCartItems = setCartItems;
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
